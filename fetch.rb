@@ -1,7 +1,6 @@
 require 'mechanize'
 require 'pry'
 
-# START OF SETTINGS
 urls = [
 	'http://www.vivareal.com.br/aluguel/santa-catarina/florianopolis/bairros/agronomica/apartamento_residencial/',
 	'http://www.vivareal.com.br/aluguel/santa-catarina/florianopolis/bairros/trindade/apartamento_residencial/',
@@ -11,11 +10,22 @@ urls = [
 max_rent_price = 1300
 min_square_meters = 40
 
-# END OF SETTINGS
+def scrape_index_pages(url, max_rent_price, min_square_meters)
+	scrape_all_properties_in_page(url, max_rent_price, min_square_meters)
 
-agent = Mechanize.new
+	agent = Mechanize.new
+	agent.get(url)
+	next_url = agent.page.links_with(text: "Próxima página >")
+	if next_url
+		next_url = next_url.last.click.uri
+		puts "Scraping next page: #{next_url}"
+		scrape_all_properties_in_page(next_url, max_rent_price, min_square_meters)
+	end
+end
 
-urls.each do |url|
+def scrape_all_properties_in_page(url, max_rent_price, min_square_meters)
+
+	agent = Mechanize.new
 	agent.get(url)
 	agent.page.links_with(text: "VER TODOS OS DETALHES").each do |link|
 		link.click
@@ -49,4 +59,9 @@ urls.each do |url|
 			end
 		end
 	end
+end
+
+
+urls.each do |url|
+	scrape_index_pages(url, max_rent_price, min_square_meters)
 end
