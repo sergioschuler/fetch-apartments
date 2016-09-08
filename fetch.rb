@@ -10,16 +10,17 @@ urls = [
 max_rent_price = 1300
 min_square_meters = 40
 
-def scrape_index_pages(url, max_rent_price, min_square_meters)
+def scrape_index_pages(url, max_rent_price, min_square_meters, page=1)
 	scrape_all_properties_in_page(url, max_rent_price, min_square_meters)
 
 	agent = Mechanize.new
 	agent.get(url)
-	next_url = agent.page.links_with(text: "Próxima página >")
-	if next_url
-		next_url = next_url.last.click.uri
-		puts "Scraping next page: #{next_url}"
-		scrape_all_properties_in_page(next_url, max_rent_price, min_square_meters)
+	page = (page + 1).to_s
+	next_url = agent.page.links_with(text: page)
+	if next_url != []
+		next_url = next_url.last.click
+		puts "Scraping next page: #{next_url.uri}"
+		scrape_index_pages(next_url.uri, max_rent_price, min_square_meters, page.to_i)
 	end
 end
 
@@ -59,9 +60,10 @@ def scrape_all_properties_in_page(url, max_rent_price, min_square_meters)
 			end
 		end
 	end
+
 end
 
-
+#binding.pry
 urls.each do |url|
 	scrape_index_pages(url, max_rent_price, min_square_meters)
 end
