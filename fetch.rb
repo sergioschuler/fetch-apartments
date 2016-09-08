@@ -42,7 +42,7 @@ def scrape_all_properties_in_page(url, max_rent_price, min_square_meters)
 		property_number_of_bathrooms = agent.page.search(".//dl[@class='property-information__item icon-bathroom']")&.children&.last&.text&.gsub(/[^\d]/, '')
 		property_number_of_garage_spots = agent.page.search(".//dl[@class='property-information__item icon-garage']")&.children&.last&.text&.gsub(/[^\d]/, '')
 		property_code = agent.page.search(".//dl[@class='property-information__item icon-ribbon']")&.children&.last&.text
-		property_description = agent.page.search(".//p[@class='property-description__detail']")&.text&.split("\n")&.join
+		property_description = agent.page.search(".//p[@class='property-description__detail']")&.text&.split("\n")&.join&.gsub(/;/, '.')
 		property_features = agent.page.search(".//ul[@class='property-description__features']")&.children&.map {|i| i&.text&.gsub(/<li>|<\/li>/, '')}
 		real_state_agent = agent.page.search(".//div[@class='publisher__logo-container']")&.at("img")["alt"]
 		real_state_agent_phone = agent.page.search(".//div[@class='publisher__telephone-wrapper']")&.children[2]&.text&.strip
